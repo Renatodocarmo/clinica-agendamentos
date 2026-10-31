@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClinicaFácil — Diagrama de Arquitetura</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f1117; color: #e2e2e2; min-height: 100vh; }
+
+  header { background: #161b27; border-bottom: 1px solid #2a2f45; padding: 18px 32px; display: flex; align-items: center; gap: 14px; }
+  header .logo { font-size: 1.6rem; }
+  header h1 { font-size: 1.2rem; font-weight: 600; color: #fff; }
+  header span { font-size: 0.82rem; color: #6b7280; margin-left: 8px; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+
+  /* Diagrama SVG */
+  .diagram-wrapper { background: #161b27; border: 1px solid #2a2f45; border-radius: 16px; padding: 24px; margin-bottom: 32px; overflow-x: auto; }
+
+  /* Camadas de detalhes */
+  .details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .detail-card { background: #161b27; border: 1px solid #2a2f45; border-radius: 12px; padding: 20px; transition: border-color 0.2s; cursor: default; }
+  .detail-card:hover { border-color: #3b82f6; }
+  .detail-card.ativo { border-color: #22c55e; background: #161b27; }
+  .detail-card h3 { font-size: 0.92rem; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .detail-card ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .detail-card li { font-size: 0.82rem; color: #9ca3af; padding-left: 14px; position: relative; }
+  .detail-card li::before { content: '→'; position: absolute; left: 0; color: #4b5563; }
+
+  .badge-tech { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: 500; margin-left: 6px; }
+  .badge-vue { background: #1a3a2a; color: #4ade80; }
+  .badge-node { background: #1a2e3a; color: #38bdf8; }
+  .badge-mongo { background: #2a2a1a; color: #facc15; }
+  .badge-jwt { background: #2a1a1a; color: #f87171; }
+  .badge-ext { background: #1a1a2a; color: #a78bfa; }
+
+  /* Fluxo de dados */
+  .fluxo-section { margin-bottom: 32px; }
+  .fluxo-section h2 { font-size: 1rem; color: #9ca3af; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; }
+  .fluxo-steps { display: flex; align-items: flex-start; gap: 0; flex-wrap: wrap; }
+  .fluxo-step { flex: 1; min-width: 140px; }
+  .step-box { background: #1e2436; border: 1px solid #2a2f45; border-radius: 8px; padding: 12px 14px; font-size: 0.82rem; }
+  .step-box .step-num { font-size: 0.7rem; color: #6b7280; margin-bottom: 4px; }
+  .step-box .step-title { font-weight: 600; color: #e2e2e2; margin-bottom: 4px; }
+  .step-box .step-desc { color: #6b7280; font-size: 0.76rem; line-height: 1.5; }
+  .step-arrow { display: flex; align-items: center; padding: 0 8px; color: #374151; font-size: 1.2rem; padding-top: 20px; }
+
+  /* SVG nodes clickable */
+  .node-clickable { cursor: pointer; }
+  .node-clickable:hover rect, .node-clickable:hover circle { filter: brightness(1.15); }
+
+  footer { text-align: center; padding: 24px; color: #374151; font-size: 0.8rem; border-top: 1px solid #1f2937; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">⚕</div>
+  <div>
+    <h1>ClinicaFácil<span>— Diagrama de Arquitetura do Sistema</span></h1>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Diagrama SVG principal -->
+  <div class="diagram-wrapper">
+    <svg width="100%" viewBox="0 0 1000 480" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#4b5563" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+        <marker id="arr-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+        <marker id="arr-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+        <marker id="arr-purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+
+      <!-- Label de camada: Cliente -->
+      <text x="50" y="28" font-size="10" fill="#4b5563" font-family="monospace" letter-spacing="1">CLIENTE</text>
+      <line x1="50" y1="34" x2="320" y2="34" stroke="#1f2937" stroke-width="1"/>
+
+      <!-- Vue.js App -->
+      <g class="node-clickable" onclick="document.getElementById('card-frontend').classList.add('ativo')">
+        <rect x="50" y="50" width="260" height="120" rx="12" fill="#0d2216" stroke="#22c55e" stroke-width="1.5"/>
+        <text x="70" y="76" font-size="11" fill="#4ade80" font-family="monospace">⬡ FRONTEND</text>
+        <text x="180" y="100" text-anchor="middle" font-size="14" fill="#e2e2e2" font-weight="600" font-family="system-ui">Vue.js 3</text>
+        <text x="180" y="118" text-anchor="middle" font-size="10" fill="#6b7280" font-family="system-ui">Composition API · Pinia · Vue Router</text>
+        <rect x="70" y="130" width="70" height="22" rx="4" fill="#1a3a2a"/>
+        <text x="105" y="145" text-anchor="middle" font-size="9" fill="#4ade80">Vite Build</text>
+        <rect x="150" y="130" width="70" height="22" rx="4" fill="#1a3a2a"/>
+        <text x="185" y="145" text-anchor="middle" font-size="9" fill="#4ade80">Axios HTTP</text>
+        <rect x="230" y="130" width="60" height="22" rx="4" fill="#1a3a2a"/>
+        <text x="260" y="145" text-anchor="middle" font-size="9" fill="#4ade80">JWT Store</text>
+      </g>
+
+      <!-- Label: Servidor -->
+      <text x="360" y="28" font-size="10" fill="#4b5563" font-family="monospace" letter-spacing="1">SERVIDOR</text>
+      <line x1="360" y1="34" x2="680" y2="34" stroke="#1f2937" stroke-width="1"/>
+
+      <!-- Node.js / Express -->
+      <g class="node-clickable">
+        <rect x="360" y="50" width="300" height="200" rx="12" fill="#0a1e2e" stroke="#38bdf8" stroke-width="1.5"/>
+        <text x="380" y="76" font-size="11" fill="#38bdf8" font-family="monospace">⬡ BACKEND</text>
+        <text x="510" y="100" text-anchor="middle" font-size="14" fill="#e2e2e2" font-weight="600" font-family="system-ui">Node.js + Express</text>
+
+        <!-- Rotas -->
+        <rect x="380" y="112" width="118" height="26" rx="5" fill="#0d2233" stroke="#1e3a50"/>
+        <text x="439" y="128" text-anchor="middle" font-size="9.5" fill="#93c5fd">/api/auth</text>
+
+        <rect x="506" y="112" width="136" height="26" rx="5" fill="#0d2233" stroke="#1e3a50"/>
+        <text x="574" y="128" text-anchor="middle" font-size="9.5" fill="#93c5fd">/api/agendamentos</text>
+
+        <rect x="380" y="146" width="118" height="26" rx="5" fill="#0d2233" stroke="#1e3a50"/>
+        <text x="439" y="162" text-anchor="middle" font-size="9.5" fill="#93c5fd">/api/external</text>
+
+        <rect x="506" y="146" width="136" height="26" rx="5" fill="#0d2233" stroke="#1e3a50"/>
+        <text x="574" y="162" text-anchor="middle" font-size="9.5" fill="#93c5fd">/api/admin</text>
+
+        <!-- Middleware JWT -->
+        <rect x="380" y="182" width="260" height="26" rx="5" fill="#1a0d2e" stroke="#4c1d95"/>
+        <text x="510" y="198" text-anchor="middle" font-size="9.5" fill="#a78bfa">🔒 Middleware JWT · Rate Limit · Validação</text>
+
+        <!-- Controllers / Models -->
+        <text x="380" y="226" font-size="9" fill="#4b5563">Controllers → Models (Mongoose) → MongoDB</text>
+      </g>
+
+      <!-- Label: Banco -->
+      <text x="720" y="28" font-size="10" fill="#4b5563" font-family="monospace" letter-spacing="1">BANCO DE DADOS</text>
+      <line x1="720" y1="34" x2="960" y2="34" stroke="#1f2937" stroke-width="1"/>
+
+      <!-- MongoDB -->
+      <g class="node-clickable">
+        <rect x="720" y="50" width="230" height="120" rx="12" fill="#1a1500" stroke="#facc15" stroke-width="1.5"/>
+        <text x="740" y="76" font-size="11" fill="#fbbf24" font-family="monospace">⬡ DATABASE</text>
+        <text x="835" y="100" text-anchor="middle" font-size="14" fill="#e2e2e2" font-weight="600" font-family="system-ui">MongoDB</text>
+        <text x="835" y="116" text-anchor="middle" font-size="10" fill="#6b7280" font-family="system-ui">Mongoose ODM</text>
+        <rect x="740" y="126" width="90" height="22" rx="4" fill="#2a2200"/>
+        <text x="785" y="141" text-anchor="middle" font-size="9" fill="#fbbf24">usuarios</text>
+        <rect x="840" y="126" width="90" height="22" rx="4" fill="#2a2200"/>
+        <text x="885" y="141" text-anchor="middle" font-size="9" fill="#fbbf24">agendamentos</text>
+      </g>
+
+      <!-- APIs Externas -->
+      <text x="720" y="218" font-size="10" fill="#4b5563" font-family="monospace" letter-spacing="1">APIS EXTERNAS</text>
+      <line x1="720" y1="224" x2="960" y2="224" stroke="#1f2937" stroke-width="1"/>
+
+      <g>
+        <rect x="720" y="236" width="108" height="60" rx="10" fill="#17122a" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="774" y="260" text-anchor="middle" font-size="11" fill="#c4b5fd">🌤</text>
+        <text x="774" y="274" text-anchor="middle" font-size="9.5" fill="#a78bfa">OpenWeather</text>
+        <text x="774" y="288" text-anchor="middle" font-size="8" fill="#6b7280">Previsão do tempo</text>
+      </g>
+
+      <g>
+        <rect x="840" y="236" width="108" height="60" rx="10" fill="#17122a" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="894" y="260" text-anchor="middle" font-size="11" fill="#c4b5fd">📮</text>
+        <text x="894" y="274" text-anchor="middle" font-size="9.5" fill="#a78bfa">ViaCEP</text>
+        <text x="894" y="288" text-anchor="middle" font-size="8" fill="#6b7280">Busca de endereço</text>
+      </g>
+
+      <!-- Paciente / Secretário / Admin (usuários) -->
+      <g>
+        <rect x="50" y="220" width="260" height="110" rx="12" fill="#111827" stroke="#374151" stroke-width="1"/>
+        <text x="70" y="245" font-size="10" fill="#4b5563" font-family="monospace">PERFIS DE ACESSO</text>
+        <circle cx="100" cy="278" r="18" fill="#1a2e1a" stroke="#22c55e" stroke-width="1"/>
+        <text x="100" y="282" text-anchor="middle" font-size="10" fill="#4ade80">👤</text>
+        <text x="100" y="300" text-anchor="middle" font-size="9" fill="#6b7280">Paciente</text>
+
+        <circle cx="180" cy="278" r="18" fill="#1a1a2e" stroke="#38bdf8" stroke-width="1"/>
+        <text x="180" y="282" text-anchor="middle" font-size="10" fill="#93c5fd">👥</text>
+        <text x="180" y="300" text-anchor="middle" font-size="9" fill="#6b7280">Secretário</text>
+
+        <circle cx="260" cy="278" r="18" fill="#2e1a1a" stroke="#f87171" stroke-width="1"/>
+        <text x="260" y="282" text-anchor="middle" font-size="10" fill="#f87171">🔑</text>
+        <text x="260" y="300" text-anchor="middle" font-size="9" fill="#6b7280">Admin</text>
+      </g>
+
+      <!-- Setas principais -->
+      <!-- Frontend → Backend -->
+      <line x1="312" y1="110" x2="358" y2="110" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arr-green)"/>
+      <text x="335" y="106" text-anchor="middle" font-size="8" fill="#4ade80">HTTP/JWT</text>
+
+      <!-- Backend → MongoDB -->
+      <line x1="662" y1="110" x2="718" y2="110" stroke="#facc15" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arr)"/>
+      <text x="690" y="106" text-anchor="middle" font-size="8" fill="#fbbf24">Mongoose</text>
+
+      <!-- Backend → OpenWeather -->
+      <line x1="580" y1="252" x2="718" y2="264" stroke="#7c3aed" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arr-purple)"/>
+
+      <!-- Backend → ViaCEP -->
+      <line x1="600" y1="260" x2="838" y2="266" stroke="#7c3aed" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arr-purple)"/>
+
+      <!-- Usuários → Frontend -->
+      <line x1="180" y1="220" x2="180" y2="172" stroke="#4b5563" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#arr)"/>
+
+      <!-- Legenda -->
+      <rect x="50" y="348" width="900" height="110" rx="10" fill="#0d1117" stroke="#1f2937"/>
+      <text x="70" y="370" font-size="10" fill="#4b5563" font-family="monospace" letter-spacing="1">LEGENDA</text>
+      <line x1="70" y1="384" x2="130" y2="384" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arr-green)"/>
+      <text x="135" y="388" font-size="9" fill="#6b7280">Requisição HTTP com JWT</text>
+      <line x1="70" y1="404" x2="130" y2="404" stroke="#facc15" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arr)"/>
+      <text x="135" y="408" font-size="9" fill="#6b7280">Consulta ao banco de dados</text>
+      <line x1="70" y1="424" x2="130" y2="424" stroke="#7c3aed" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arr-purple)"/>
+      <text x="135" y="428" font-size="9" fill="#6b7280">Chamada a APIs externas</text>
+
+      <rect x="310" y="375" width="12" height="12" rx="2" fill="#0d2216" stroke="#22c55e"/>
+      <text x="328" y="385" font-size="9" fill="#6b7280">Vue.js Frontend</text>
+      <rect x="310" y="395" width="12" height="12" rx="2" fill="#0a1e2e" stroke="#38bdf8"/>
+      <text x="328" y="405" font-size="9" fill="#6b7280">Node.js Backend</text>
+      <rect x="310" y="415" width="12" height="12" rx="2" fill="#1a1500" stroke="#facc15"/>
+      <text x="328" y="425" font-size="9" fill="#6b7280">MongoDB Database</text>
+      <rect x="310" y="435" width="12" height="12" rx="2" fill="#17122a" stroke="#7c3aed"/>
+      <text x="328" y="445" font-size="9" fill="#6b7280">APIs Externas</text>
+
+      <text x="550" y="388" font-size="9" fill="#374151">🔒 Todas as rotas (exceto /registro e /login)</text>
+      <text x="550" y="404" font-size="9" fill="#374151">    são protegidas por middleware JWT</text>
+      <text x="550" y="420" font-size="9" fill="#374151">🛡 Rate limiting: 100 req / 15 min por IP</text>
+      <text x="550" y="436" font-size="9" fill="#374151">📦 Senhas hasheadas com bcrypt (salt: 12)</text>
+      <text x="550" y="452" font-size="9" fill="#374151">🌐 CORS configurado para origem específica</text>
+    </svg>
+  </div>
+
+  <!-- Cards de detalhe -->
+  <div class="details-grid">
+    <div class="detail-card" id="card-frontend">
+      <h3>⬡ Frontend <span class="badge-tech badge-vue">Vue 3</span></h3>
+      <ul>
+        <li>Views: Login, Registro, Dashboard, Agendamentos, Perfil, Admin</li>
+        <li>Sidebar com navegação e controle de perfil</li>
+        <li>Pinia Store para estado de autenticação global</li>
+        <li>Vue Router com guardas de navegação (beforeEach)</li>
+        <li>Axios com interceptor JWT automático</li>
+        <li>Busca de CEP ao digitar (ViaCEP via backend)</li>
+        <li>Grid de horários disponíveis em tempo real</li>
+        <li>Alerta de chuva integrado ao formulário de agendamento</li>
+      </ul>
+    </div>
+    <div class="detail-card">
+      <h3>⬡ Backend <span class="badge-tech badge-node">Node.js</span></h3>
+      <ul>
+        <li>Express com estrutura MVC (routes → controllers → models)</li>
+        <li>4 grupos de rotas: auth, agendamentos, external, admin</li>
+        <li>express-validator para validação de entrada</li>
+        <li>express-rate-limit: 100 req/15min por IP</li>
+        <li>Middleware autorizar() por perfil (paciente/secretario/admin)</li>
+        <li>Índice único: médico + data + horário (evita conflitos)</li>
+        <li>Integração com ViaCEP e OpenWeatherMap</li>
+        <li>Exporta app separado do listen (testabilidade)</li>
+      </ul>
+    </div>
+    <div class="detail-card">
+      <h3>⬡ Banco de Dados <span class="badge-tech badge-mongo">MongoDB</span></h3>
+      <ul>
+        <li>Collection usuarios: nome, email, senha (hash), perfil, endereco</li>
+        <li>Collection agendamentos: paciente (ref), medico, data, horario, status</li>
+        <li>Subdocumento previsaoClimatica no agendamento</li>
+        <li>Índice composto único (medico + data + horario)</li>
+        <li>Mongoose ODM com hooks pre-save para hash de senha</li>
+        <li>Timestamps automáticos em todos os documentos</li>
+      </ul>
+    </div>
+    <div class="detail-card">
+      <h3>🔒 Autenticação <span class="badge-tech badge-jwt">JWT</span></h3>
+      <ul>
+        <li>Tokens JWT com expiração de 7 dias (configurável)</li>
+        <li>Senhas hasheadas com bcrypt, salt rounds = 12</li>
+        <li>Middleware autenticar() verifica token em todas as rotas protegidas</li>
+        <li>Middleware autorizar(...perfis) verifica permissão por perfil</li>
+        <li>Token enviado no header Authorization: Bearer &lt;token&gt;</li>
+        <li>Interceptor Axios injeta token automaticamente</li>
+        <li>Remoção automática do campo senha no toJSON()</li>
+      </ul>
+    </div>
+    <div class="detail-card">
+      <h3>🌤 APIs Externas <span class="badge-tech badge-ext">Integração</span></h3>
+      <ul>
+        <li>ViaCEP: GET https://viacep.com.br/ws/{cep}/json/ — sem autenticação</li>
+        <li>OpenWeatherMap: /forecast?q={cidade}&appid={key} — 5 dias</li>
+        <li>climaService.js encontra previsão mais próxima da data da consulta</li>
+        <li>Campo temChuva detecta: Rain, Drizzle, Thunderstorm</li>
+        <li>Alerta de chuva retornado no POST /agendamentos</li>
+        <li>Falha silenciosa: se API indisponível, agendamento continua</li>
+      </ul>
+    </div>
+    <div class="detail-card">
+      <h3>🐳 DevOps <span class="badge-tech badge-node">Docker</span></h3>
+      <ul>
+        <li>Dockerfile backend: node:18-alpine, usuário não-root</li>
+        <li>Dockerfile frontend: build multi-stage com Nginx</li>
+        <li>docker-compose.yml: mongo + backend + frontend</li>
+        <li>Health check automático no container MongoDB</li>
+        <li>Volume persistente para dados do MongoDB</li>
+        <li>Nginx como proxy reverso para o backend</li>
+        <li>Testes automatizados com Jest + Supertest + mongodb-memory-server</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Fluxo de agendamento -->
+  <div class="fluxo-section">
+    <h2>Fluxo de Agendamento com Clima</h2>
+    <div class="fluxo-steps">
+      <div class="fluxo-step">
+        <div class="step-box">
+          <div class="step-num">01</div>
+          <div class="step-title">Usuário autentica</div>
+          <div class="step-desc">POST /auth/login → recebe JWT → armazenado no Pinia Store</div>
+        </div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="fluxo-step">
+        <div class="step-box">
+          <div class="step-num">02</div>
+          <div class="step-title">Seleciona médico e data</div>
+          <div class="step-desc">GET /horarios-disponiveis → backend consulta MongoDB → retorna slots livres</div>
+        </div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="fluxo-step">
+        <div class="step-box">
+          <div class="step-num">03</div>
+          <div class="step-title">Busca previsão</div>
+          <div class="step-desc">GET /external/clima → backend chama OpenWeatherMap → retorna temChuva</div>
+        </div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="fluxo-step">
+        <div class="step-box">
+          <div class="step-num">04</div>
+          <div class="step-title">Confirma agendamento</div>
+          <div class="step-desc">POST /agendamentos → valida horário → salva no MongoDB com clima</div>
+        </div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="fluxo-step">
+        <div class="step-box">
+          <div class="step-num">05</div>
+          <div class="step-title">Alerta exibido</div>
+          <div class="step-desc">Se temChuva = true → frontend exibe aviso ⚠️ para o paciente</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>ClinicaFácil · Sistema de Agendamento de Consultas · Vue.js + Node.js + MongoDB</footer>
+</body>
+</html>

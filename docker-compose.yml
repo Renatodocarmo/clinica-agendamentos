@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # Banco de dados MongoDB
+  mongo:
+    image: mongo:7
+    container_name: clinica_mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: clinica_db
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - clinica_net
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend Node.js
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: clinica_backend
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      MONGODB_URI: mongodb://mongo:27017/clinica_db
+      JWT_SECRET: ${JWT_SECRET:-mude_essa_chave_em_producao_use_uma_longa}
+      JWT_EXPIRES_IN: 7d
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY:-}
+      OPENWEATHER_CITY: ${OPENWEATHER_CITY:-São Paulo}
+      OPENWEATHER_COUNTRY: ${OPENWEATHER_COUNTRY:-BR}
+      FRONTEND_URL: http://localhost
+    networks:
+      - clinica_net
+    ports:
+      - "3000:3000"
+
+  # Frontend Vue.js (Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: clinica_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - clinica_net
+    ports:
+      - "80:80"
+
+volumes:
+  mongo_data:
+    driver: local
+
+networks:
+  clinica_net:
+    driver: bridge
